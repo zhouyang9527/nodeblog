@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/node_modules/mditor/dist/css/mditor.min.css">
+    <script src="/node_modules/mditor/dist/js/mditor.min.js"></script>
+</head>
+
+<body>
+    <%- include('../header')%>
+        <div class="container">
+            <h1>文章添加页</h1>
+            <hr>
+            <form id='form'>
+                <!-- 在进入文章添加页面的一瞬间，就立即把  文章的  作者id 保存到 一个隐藏域中， 防止session失效的问题 -->
+                <input type="hidden" name="authorId" value="%=user.id%">
+                <div class="form-group">
+                    <label>文章标题</label>
+                    <input type="text" name="title" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>文章内容</label>
+                    <input type="text" id="editor" name="content" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="发表文章" class="btn btn-primary">
+                </div>
+            </form>
+        </div>
+        <%- include('../footer')%>
+</body>
+<script>
+    $(function() {
+        var mditor = Mditor.fromTextarea(document.querySelector('#editor'))
+        mditor.on('ready', () => {
+            mditor.value = "** hello world **"
+        })
+
+        $('#form').on('submit', e => {
+            e.preventDefault()
+            $.ajax({
+                type: "post",
+                url: "/addArticleContent",
+                data: $('#form').serialize(),
+                success: function(res) {
+                    console.log(res);
+                    if (res.status == 200) {
+                        location.href = '/article/info/' + res.insertId
+                    }
+                }
+            });
+        })
+    })
+</script>
+
+</html>
